@@ -1,4 +1,6 @@
 # GPS-Sjetnik
+![image](https://github.com/craftyBLUE/GPS-Sjetnik/assets/62440666/46bc99b4-0d0d-41c9-8253-dda943d83f62)
+
 ## English
 *GPS Sjetnik* means *GPS Reminder*
 An Android app that allows the user to make alarms or reminders that active upon entering a specified area using GPS.
