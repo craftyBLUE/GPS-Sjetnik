@@ -31,37 +31,7 @@ lateinit var map : MapView
 
 lateinit var currentLocationCircle : TriggerRadius
 
-fun initMap(context: Context) {
-  map.setTileSource(TileSourceFactory.MAPNIK)
-  map.setMultiTouchControls(true)
-  map.isHorizontalMapRepetitionEnabled = true
-  map.isVerticalMapRepetitionEnabled = false
-  map.controller.setZoom(13)
-  map.isTilesScaledToDpi = true
-  map.controller.setCenter(GeoPoint(currentLocationPin.latitude, currentLocationPin.longitude))
-
-  /*var compassOverlay = CompassOverlay(applicationContext, InternalCompassOrientationProvider(applicationContext), map)
-  compassOverlay.enableCompass()
-  map.overlays.add(compassOverlay)*/
-
-  /*val overlayGrid = LatLonGridlineOverlay2()
-  map.overlays.add(overlayGrid)*/
-
-  centerMarker = Marker(map)
-  circleTrigger = TriggerRadius(map)
-
-  val dm : DisplayMetrics = context.resources.displayMetrics
-  val scaleBarOverlay = ScaleBarOverlay(map)
-  scaleBarOverlay.setCentred(true)
-
-  //https://github.com/osmdroid/osmdroid/issues/295#issuecomment-1044323136 <3
-  val mapEventsReceiver = MapEventsReceiverImpl(map)
-  val mapEventsOverlay = MapEventsOverlay(mapEventsReceiver)
-  map.overlays.add(mapEventsOverlay)
-
-  scaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10)
-  map.overlays.add(scaleBarOverlay)
-
+fun refreshTriggers(context: Context) {
   var displayPins = displayPinAdapter.getDisplayPins()
 
   for (i in 0..<displayPins.size) {
@@ -100,6 +70,46 @@ fun initMap(context: Context) {
   }, context)
   itemsOverlay.setFocusItemsOnTap(true);
   map.overlays.add(itemsOverlay);
+}
+
+fun refreshMapOverlays(context: Context) {
+  map.overlays.clear()
+
+  val dm : DisplayMetrics = context.resources.displayMetrics
+  val scaleBarOverlay = ScaleBarOverlay(map)
+  scaleBarOverlay.setCentred(true)
+
+  scaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10)
+  map.overlays.add(scaleBarOverlay)
+
+  //https://github.com/osmdroid/osmdroid/issues/295#issuecomment-1044323136 <3
+  val mapEventsReceiver = MapEventsReceiverImpl(map)
+  val mapEventsOverlay = MapEventsOverlay(mapEventsReceiver)
+  map.overlays.add(mapEventsOverlay)
+
+  refreshTriggers(context)
+}
+
+fun initMap(context: Context) {
+  map.setTileSource(TileSourceFactory.MAPNIK)
+  map.setMultiTouchControls(true)
+  map.isHorizontalMapRepetitionEnabled = true
+  map.isVerticalMapRepetitionEnabled = false
+  map.controller.setZoom(13)
+  map.isTilesScaledToDpi = true
+  map.controller.setCenter(GeoPoint(currentLocationPin.latitude, currentLocationPin.longitude))
+
+  /*var compassOverlay = CompassOverlay(applicationContext, InternalCompassOrientationProvider(applicationContext), map)
+  compassOverlay.enableCompass()
+  map.overlays.add(compassOverlay)*/
+
+  /*val overlayGrid = LatLonGridlineOverlay2()
+  map.overlays.add(overlayGrid)*/
+
+  centerMarker = Marker(map)
+  circleTrigger = TriggerRadius(map)
+
+  refreshMapOverlays(context)
 
   //mapInitialized = true
 }
@@ -170,6 +180,8 @@ class MapActivity : Activity() {
           titleEditText.text.toString()))
       titleEditText.setText("")
       displayPinAdapter.saveState()
+      
+      refreshMapOverlays(applicationContext)
     }
 
     displayCurrentLocation()
